@@ -38,7 +38,13 @@ public:
         }
     }
     
-    //Listar tarefas pendentes
+    static void ListarTarefasPendentes() {
+        for (int i = 0; i < tarefas.size(); i++) {
+            if (!tarefas[i].estaConcluida()) {
+                cout << i << ". " << tarefas[i].getDescricao() << endl;
+            }
+        }
+    }
 
     // salvar tarefas
 

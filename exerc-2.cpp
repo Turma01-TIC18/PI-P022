@@ -28,11 +28,16 @@ private:
 
 class GerenciadorTarefas {
 public:
+    static void AdicionarTarefa(const string& descricao) {
+        tarefas.push_back(Tarefa(descricao));
+    }
 
-    //Adicionar tarefa
-
-    //Marcar tarefa concluida
-
+    static void MarcarTarefaConcluida(int indice) {
+        if (indice >= 0 && indice < tarefas.size()) {
+            tarefas[indice].marcarConcluida();
+        }
+    }
+    
     //Listar tarefas pendentes
 
     // salvar tarefas

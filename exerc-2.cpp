@@ -5,68 +5,98 @@
 using namespace std;
 
 class Tarefa {
-public:
-    Tarefa(const string& descricao, bool concluida = false)
-        : descricao(descricao), concluida(concluida) {}
+    private:
+        string descricao;
+        bool concluida;
 
-    string getDescricao() const {
-        return descricao;
-    }
+    public:
+        Tarefa(string _descricao, bool _concluida = false){
+            descricao = _descricao;
+            concluida = _concluida;
+        }
+            
+        string getDescricao() {
+            return descricao;
+        }
 
-    bool estaConcluida() const {
-        return concluida;
-    }
+        bool estaConcluida() {
+            return concluida;
+        }
 
-    void marcarConcluida() {
-        concluida = true;
-    }
-
-private:
-    string descricao;
-    bool concluida;
+        void marcarConcluida() {
+            concluida = true;
+        }
+    
 };
 
 class GerenciadorTarefas {
-public:
-    static void AdicionarTarefa(const string& descricao) {
-        tarefas.push_back(Tarefa(descricao));
-    }
+    private:
+    static vector<Tarefa> tarefas;
 
-    static void MarcarTarefaConcluida(int indice) {
-        if (indice >= 0 && indice < tarefas.size()) {
-            tarefas[indice].marcarConcluida();
+    public:
+        static void adicionarTarefa(string descricao) {
+            tarefas.push_back(Tarefa(descricao));
         }
-    }
-    
-    static void ListarTarefasPendentes() {
-        for (int i = 0; i < tarefas.size(); i++) {
-            if (!tarefas[i].estaConcluida()) {
-                cout << i << ". " << tarefas[i].getDescricao() << endl;
+
+        static void marcarTarefaConcluida(int indice) {
+            if (indice >= 0 && indice < tarefas.size()) {
+                tarefas[indice].marcarConcluida();
             }
         }
-    }
+        
+        static void listarTarefasPendentes() {
+            for (int i = 0; i < tarefas.size(); i++) {
+                if (!tarefas[i].estaConcluida()) {
+                    cout << i << ". " << tarefas[i].getDescricao() << endl;
+                }
+            }
+        }
 
-    // salvar tarefas
+        static void salvarTarefas(string nomeArquivo) {
+            ofstream arquivo(nomeArquivo);
+            if (arquivo.is_open()) {
+                for (Tarefa& tarefa : tarefas) {
+                    arquivo << tarefa.getDescricao() << "," << tarefa.estaConcluida() <<endl;
+                }
+                arquivo.close();
+            }
+        }
 
-    // carregar tarefas
-
-private:
-    static vector<Tarefa> tarefas;
+        static void carregarTarefas(string nomeArquivo) {
+            ifstream arquivo(nomeArquivo);
+            if (arquivo.is_open()) {
+                tarefas.clear();
+                string linha;
+                while (getline(arquivo, linha)) {
+                    size_t pos = linha.find(',');
+                    if (pos != string::npos) {
+                        string descricao = linha.substr(0, pos);
+                        bool concluida = (linha.substr(pos + 1) == "1");
+                        Tarefa tarefa(descricao);
+                        if (concluida) {
+                            tarefa.marcarConcluida();
+                        }
+                        tarefas.push_back(tarefa);
+                    }
+                }
+                arquivo.close();
+            }
+        }
 };
 
 vector<Tarefa> GerenciadorTarefas::tarefas;
 
 int main() {
 
-    GerenciadorTarefas::CarregarTarefas("tarefas.txt");
+    GerenciadorTarefas::carregarTarefas("tarefas.txt");
 
     while (true) {
 
-        cout << "Escolha uma opção:\n";
-        cout << "1. Adicionar nova tarefa\n";
-        cout << "2. Marcar tarefa como concluída\n";
-        cout << "3. Listar tarefas pendentes\n";
-        cout << "4. Sair e salvar\n";
+        cout << "Escolha uma opção:" << endl;;
+        cout << "1. Adicionar nova tarefa" << endl;;
+        cout << "2. Marcar tarefa como concluída" << endl;;
+        cout << "3. Listar tarefas pendentes" << endl;;
+        cout << "4. Sair e salvar" << endl;
 
         int opcao;
         cin >> opcao;
@@ -77,24 +107,23 @@ int main() {
             cout << "Digite a descrição da tarefa: ";
             string descricao;
             getline(cin, descricao);
-            GerenciadorTarefas::AdicionarTarefa(descricao);
+            GerenciadorTarefas::adicionarTarefa(descricao);
 
         } else if (opcao == 2) {
             cout << "Digite o índice da tarefa a ser marcada como concluída: ";
             int indice;
             cin >> indice;
-            GerenciadorTarefas::MarcarTarefaConcluida(indice);
+            GerenciadorTarefas::marcarTarefaConcluida(indice);
 
         } else if (opcao == 3) {
             cout << "Tarefas pendentes:\n";
-            GerenciadorTarefas::ListarTarefasPendentes();
+            GerenciadorTarefas::listarTarefasPendentes();
 
         } else if (opcao == 4) {
-            GerenciadorTarefas::SalvarTarefas("tarefas.txt");
+            GerenciadorTarefas::salvarTarefas("tarefas.txt");
             break;
-
         }
     }
 
-return 0;
+    return 0;
 }
